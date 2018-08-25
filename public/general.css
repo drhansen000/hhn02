@@ -1,0 +1,14 @@
+body {
+    text-align: center;
+    font-size: 18px;
+    background-color: silver;
+}
+
+#page {
+    margin-left: 8%;
+    background-color: #00A997;
+}
+
+#information {
+    margin-left: 8%;
+}

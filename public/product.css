@@ -1,0 +1,17 @@
+.product-image {
+    width: 80%;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
+}
+
+.product-item {
+    border-color: black;
+    border-bottom-style: solid;
+    border-top-style: solid;
+}

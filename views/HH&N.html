@@ -1,0 +1,122 @@
+﻿<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="bootstrap-css/bootstrap.min.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="createNavbar.js"></script>
+    <link rel="stylesheet" href="col.css" />
+    <link rel="stylesheet" href="navbar.css" />
+    <link rel="stylesheet" href="footer.css" />
+    <link rel="stylesheet" href="general.css" />
+    <link rel="stylesheet" href="appointmentConfirmation.css" />
+    <link rel="stylesheet" href="product.css" />
+    <link rel="stylesheet" href="cart.css" />
+    <link rel="stylesheet" href="appointment.css" />
+    <title>About Us</title>
+</head>
+<body>
+    <div id="page" class="col-10">
+        <nav class="navbar navbar-expand-sm fixed-top col-10" id="pageNavbar">
+            <ul class="navbar-nav" id="leftNavbar">
+                <li><img class="navbar-brand" alt="HH&N Logo" src="images/green-black-logo.png" width="80" height="70" /></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:createAboutPage();">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:createAppointmentPage();">Create Appointment</a>
+                </li>
+                <li class="nav-item btn-group nav-link">
+                    <a id="reserve-product-link" href="javascript:createProductPage();">Reserve Product</a>
+                    <a id="brand-dropdown-caret" class="btn dropdown-toggle" data-toggle="dropdown"></a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#TeaTree');">Tea Tree</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#MarulaOil');">Marula Oil</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Awapuhi');">Awapuhi</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Strength');">Strength</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#ColorCare');">Color Care</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Moisture');">Moisture</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Kids');">Kids</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Curls');">Curls</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#NeuroLiquid');">Neuro Liquid</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Invisiblewear');">Invisiblewear</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Smoothing');">Smoothing</a></li>
+                        <li><a class="dropdown-item" href="javascript:createProductPage('#Mitch');">Mitch</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:createContactPage();">Contact Us</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav navbar-right" id="rightNavbar">
+                <li class="nav-item" id="cartTab">
+                    <a id="cartIcon" class="nav-link" href="javascript:createCartPage();"
+                       value="0">
+                        <script>updateCartIcon();</script>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <img src="images/menCut01.jpg" class="col-12 navbar-banner" alt="Men's Cut Photo" height="500" style="display: block" />
+        <img src="images/color01.jpg" class="col-12 navbar-banner" alt="Coloring Photo" height="500" style="display: none" />
+        <img src="images/menCut02.jpg" class="col-12 navbar-banner" alt="Men's Cut Photo" height="500" style="display: none" />
+        <img src="images/womenCut01.jpg" class="col-12 navbar-banner" alt="Women's Cut Photo" height="500" style="display: none" />
+        <img src="images/menCut03.jpg" class="col-12 navbar-banner" alt="Men's Cut Photo" height="500" style="display: none" />
+        <img src="images/color02.jpg" class="col-12 navbar-banner" alt="Coloring Photo" height="500" style="display: none" />
+        <img src="images/menCut04.jpg" class="col-12 navbar-banner" alt="Men's Cut Photo" height="500" style="display: none" />
+        <img src="images/makeup01.jpg" class="col-12 navbar-banner" alt="Makeup Photo" height="500" style="display: none" />
+        <div id="information" class="col-10">
+        </div>
+        <footer>
+            <div class="col-4 align-left">&copy; Copyright 2018</div>
+            <div class="col-8 align-right">
+                <h3>Please like our page!</h3>
+                <a href="https://www.facebook.com/karli.hansen.737" target="_blank">
+                    <img class="icon" src="/images/facebook-icon.png"
+                         alt="Facebook icon">
+                </a>
+                <a href="https://www.instagram.com/karlihansen_hhn/" target="_blank">
+                    <img class="icon" src="/images/instagram-icon.png"
+                         alt="Instagram icon">
+                </a>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
+<script src="banner.js"></script>
+<script src="createAbout.js"></script>
+<script src="createContact.js"></script>
+<script src="createAppointment.js"></script>
+<script src="createAppointmentConfirmation.js"></script>
+<script src="createProduct.js"></script>
+<script src="createCart.js"></script>
+<script>
+    window.onload = function createPage() {
+        // Depending on the URL path, create the appropriate page
+        switch (window.location.pathname) {
+            case '/Product-List':
+                createProductPage();
+                break;
+            case '/Contact':
+                createContactPage();
+                break;
+            case '/Appointment':
+                createAppointmentPage();
+                break;
+            case '/Appointment-Confirmation':
+                createAppointmentConfirmationPage();
+                break;
+            case '/Cart':
+                createCartPage();
+                break;
+            default:
+                createAboutPage();
+                break;
+        }
+        // Create the banner images and rotate every 3 seconds
+        centerBannerImage(images[0]);
+        this.setInterval(changeBanner, 3000);
+    }
+</script>

@@ -1,0 +1,62 @@
+.navbar-nav {
+    background-color: black;
+    padding: 0;
+}
+
+.navbar {
+    margin-left: 8%;
+}
+
+.nav-item {
+    display: inline;
+    padding: 0;
+}
+
+.nav-link, #reserve-product-link {
+    color: white;
+    font-size: 20px;
+    padding: 1em;
+}
+
+.nav-item:hover {
+    background-color:burlywood;
+}
+
+.navbar-banner {
+    margin-top: 8%;
+    width: auto;
+}
+
+#reserve-product-link {
+    text-decoration: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+#reserve-product-link:hover, #brand-dropdown-caret:hover {
+    color: blue;
+}
+
+#leftNavbar {
+    border-bottom-left-radius: 8px;
+    border-top-left-radius: 8px;
+    width: 100%;
+}
+
+#rightNavbar {
+    border-bottom-right-radius: 8px;
+    border-top-right-radius: 8px;
+    width: 15%;
+}
+
+@media only screen and (max-width: 580px) {
+    #rightNavbar { 
+        width: 100%; 
+        border-bottom-left-radius: 8px;
+        border-top-right-radius: 0;
+    }
+    #leftNavbar {
+        border-top-right-radius: 8px;
+        border-bottom-left-radius: 0;
+    }
+}

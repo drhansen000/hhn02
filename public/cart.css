@@ -1,0 +1,18 @@
+.removeAnchor {
+    font-size: 14px;
+    color: black;
+    text-decoration: underline;
+}
+.removeAnchor:hover {
+    background-color: burlywood;
+    cursor: pointer;
+    color:blue;
+}
+
+.nameList {
+    text-align: right;
+}
+
+.priceList {
+    text-align: left;
+}
