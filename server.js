@@ -23,10 +23,11 @@ app.get(['/', '/About', '/Contact', '/Appointment', '/Product-List', '/Cart'], (
 /*
  * Create a seperate page for the manager.
  */
-app.get('/manager', (req, res) => {
+app.get(['/Manager', '/Manager-Appointments', '/Manager-Products'], (req, res) => {
     res.render('manager.html');
 });
 
+// Formatting and information for other functions
 /*
  * This function returns the current date in a YYYY-MM-DD format.
  */ 
@@ -88,6 +89,45 @@ app.post('/confirm-purchase-query', (req, res) => {
         Date: getCurrentDate()
     });
     res.status(200).send({ status: 'ok' });
+});
+
+app.post('/login-query', (req, res) => {
+    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
+        .then(() => {
+            res.status(200).send({ status: 'ok' });
+        })
+        .catch((error) => {
+            res.send({ status: 'invalid' });
+        });
+});
+
+app.get('/logout-query', (req, res) => {
+    firebase.auth().signOut().then(function () {
+        res.render('login.hbs');
+    }, function (error) {
+        console.log(error.message);
+    });
+});
+
+app.get('/manager-appointments-query', (req, res) => {
+    var futureAppRef = db.db.ref(`/Appointment`).orderByChild('date');
+    futureAppRef.once('value', (snapshot) => {
+        var filteredFutureApp = new Array();
+        var numberOfAppointments = 0;
+        snapshot.forEach((childSnapshot) => {
+            if (childSnapshot.val().date >= getCurrentDate()) {
+                filteredFutureApp.push(childSnapshot);
+            }
+        });
+        console.log("success");
+        res.status(200).json(filteredFutureApp);
+    }).catch((e) => {
+        console.log(`Query Error Message: ${e}`);
+    });
+});
+
+app.get('/manager-products-query', (req, res) => {
+    
 });
 
 // Update information in DB

@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="navbar.css" />
     <link rel="stylesheet" href="footer.css" />
     <link rel="stylesheet" href="general.css" />
+    <link rel="stylesheet" href="managerLogin.css" />
     <title>About Us</title>
 </head>
 <body>
@@ -17,6 +18,17 @@
         <nav class="navbar navbar-expand-sm fixed-top col-10" id="pageNavbar">
             <ul class="navbar-nav" id="leftNavbar">
                 <li><img class="navbar-brand" alt="HH&N Logo" src="images/green-black-logo.png" width="80" height="70" /></li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:createManagerAppointmentsPage();">Appointments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="javascript:createManagerProductsPage();">Products</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li id="loginBtn" class="nav-item">
+                    <a class="nav-link" href="javascript:createManagerLoginPage();">Login</a>
+                </li>
             </ul>
         </nav>
         <img src="images/menCut01.jpg" class="col-12 navbar-banner" alt="Men's Cut Photo" height="500" style="display: block" />
@@ -47,32 +59,25 @@
 </body>
 </html>
 <script src="banner.js"></script>
+<script src="createManagerLogin.js"></script>
+<script src="createManagerAppointments.js"></script>
+<script src="createManagerProducts.js"></script>
 <script>
-    window.onload = function createPage()  {
+    window.onload = function createPage() {
         // Create the banner images and rotate every 3 seconds
         centerBannerImage(images[0]);
         this.setInterval(changeBanner, 3000);
-    }
-
-    function login() {
-        var email = document.getElementById('emailInput').value;
-        var password = document.getElementById('passwordInput').value;
-
-        var httpRequest = new XMLHttpRequest();
-        httpRequest.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                var queryStatus = JSON.parse(this.responseText);
-                if (queryStatus.status === 'ok') {
-                    window.location.href = "/appointments";
-                } else {
-                    document.getElementById("errorMessage").style.visibility = "visible";
-                }
-            }
-        };
-
-        httpRequest.open("POST", '/login-query', true);
-        //this is required for post method only
-        httpRequest.setRequestHeader('Content-Type', 'application/json');
-        httpRequest.send(JSON.stringify({ email: email, password: password }));
+        // Create the desired page
+        switch (window.location.pathname) {
+            case '/Manager-Appointments':
+                createManagerAppointmentsPage();
+                break;
+            case '/Manager-Products':
+                createManagerProductsPage();
+                break;
+            default:
+                createManagerLoginPage();
+                break;
+        }
     }
 </script>
