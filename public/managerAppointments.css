@@ -11,3 +11,11 @@ td, th {
 .filled {
     background-color: deeppink;
 }
+
+td a {
+    color: black;
+}
+
+#appointments {
+    text-align: center;
+}

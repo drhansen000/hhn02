@@ -1,8 +1,11 @@
+// Make global variables
+var appointmentList;
+
 function createManagerAppointmentsPage() {
     var appointmentsDiv;
     appointmentsDiv = `ERROR`;
     // Query the DB for the appointments
-    var httpRequest = new XMLHttpRequest();
+    const httpRequest = new XMLHttpRequest();
     httpRequest.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             appointmentsDiv = `<div id="appointments">
@@ -14,10 +17,13 @@ function createManagerAppointmentsPage() {
             // Create the basic structure of the table
             createTableOutline();
             // Put the response into an object format
-            var appointmentList = JSON.parse(this.responseText);
+            appointmentList = JSON.parse(this.responseText);
             // Fill the table cells where the time is already taken on the specific day
             for (var i = 0; i < appointmentList.length; i++) {
-                fillCells(appointmentList[i]);
+                if (appointmentList[i].info == '') {
+                    appointmentList[i].info = 'None';
+                }
+                fillCells(appointmentList[i], i);
             }
         }
     };
@@ -189,7 +195,7 @@ function createTableOutline() {
 }
 
 // Create global variables
-var availableTimes = new Array('900',
+const availableTimes = new Array('900',
     '930',
     '1000',
     '1030',
@@ -210,15 +216,19 @@ var availableTimes = new Array('900',
  * This function checks the day and time of the appointment. It then fills the corresponding 
  * time slot in the table.
  */
-function fillCells(appointment) {
-    var date = new Date(appointment.date);
-    var time = appointment.time;
-    var duration = appointment.duration;
-    var desiredTd;
+function fillCells(appointment, i) {
+    // Get the appointment's information
+    const date     = new Date(appointment.date);
+    const time     = appointment.time;
+    const duration = appointment.duration;
+    const service  = appointment.service;
     // Locate the appointment's starting time
-    desiredTd = availableTimes.indexOf(time) * 7 + date.getDay();
+    var desiredTd = availableTimes.indexOf(time) * 7 + date.getDay() + 1;
     // Fill the appointment's cell
     document.getElementsByTagName('td')[desiredTd].style = "background-color: deeppink;"
+    // Insert the information into the correct cell
+    document.getElementsByTagName('td')[desiredTd].innerHTML = `<a 
+        href="javascript:displayAppointmentInformation(${i})">${service}</a>`;
     // Fill sufficient cells for the appointment's duration
     if (duration > 30) {
         document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; background-color: deeppink";
@@ -235,4 +245,15 @@ function fillCells(appointment) {
         desiredTd += 7;
         document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: deeppink";
     }
+}
+
+function displayAppointmentInformation(i) {
+    const appointmentInformation = `Name:   ${appointmentList[i].name}\n` +
+        `Service: ${appointmentList[i].service}\n` +
+        `Date:     ${formatDate(appointmentList[i].date)}\n` +
+        `Time:     ${formatTime(appointmentList[i].time)}\n` +
+        `Contact: ${appointmentList[i].contact}\n` +
+        `Additional Information:\n` +
+        `${appointmentList[i].info}`;
+    alert(appointmentInformation);
 }

@@ -22,9 +22,9 @@ function createManagerLoginPage() {
 }
 
 function login() {
-    var email = document.getElementById('emailInput').value;
-    var password = document.getElementById('passwordInput').value;
-    var httpRequest = new XMLHttpRequest();
+    const email = document.getElementById('emailInput').value;
+    const password = document.getElementById('passwordInput').value;
+    const httpRequest = new XMLHttpRequest();
     httpRequest.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var queryStatus = JSON.parse(this.responseText);

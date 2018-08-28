@@ -28,7 +28,7 @@ function createEmptyCart() {
 function displayCartContents() {
     var cartContents;
     if (sessionStorage.getItem('cart') && JSON.parse(sessionStorage.getItem('cart')).length != 0) {
-        var cartObject = JSON.parse(sessionStorage.getItem('cart'));
+        const cartObject = JSON.parse(sessionStorage.getItem('cart'));
         var cartContent = '';
         var total = 0;
         var item = 0;
@@ -84,15 +84,14 @@ function removeFromCart(item) {
 }
 
 function confirmPurchase() {
-    var cartObject = JSON.parse(sessionStorage.getItem('cart'));
-    var contact = document.getElementById('contact').value;
-    var name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+    const cartObject = JSON.parse(sessionStorage.getItem('cart'));
+    const contact = document.getElementById('contact').value;
+    const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
     // Send a request to the server for every item purchased
     for (var i = 0; i < cartObject.length; i++) {
-        var httpRequest = new XMLHttpRequest();
+        const httpRequest = new XMLHttpRequest();
         httpRequest.onreadystatechange = function () {
             if (this.readyState == 4 && this.status === 200) {
-                var responseObj = JSON.parse(this.responseText);
                 var responseMessage = '';
                 responseMessage = '<h1>Thank you for shopping with us!</h1>';
                 responseMessage += '<p> Your items will be available for pickup within 3 days.</p > ';

@@ -96,8 +96,8 @@ function createAppointmentPage() {
 }
 
 // Create global variables
-var saturdayAvailabilities = createSaturdayAvailabilities();
-var weekdayAvailabilities = createWeekdayAvailabilities();
+const saturdayAvailabilities = createSaturdayAvailabilities();
+const weekdayAvailabilities = createWeekdayAvailabilities();
 var service;
 var appointmentDate;
 var appointmentTime;
@@ -145,8 +145,8 @@ function createWeekdayAvailabilities() {
  * service selected from the drop-down.
  */ 
 function updateServiceDescription() {
-    var serviceId = document.getElementById('serviceSelector').value;
-    var httpRequest = new XMLHttpRequest();
+    const serviceId = document.getElementById('serviceSelector').value;
+    const httpRequest = new XMLHttpRequest();
     httpRequest.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var serviceObj = JSON.parse(this.responseText);
@@ -171,7 +171,7 @@ function updateServiceDescription() {
  */ 
 function updateNormalHours() {
     // Create the variables that will be used during the function
-    var appointmentDate = new Date(document.getElementById("appointmentDate").value);
+    const appointmentDate = new Date(document.getElementById("appointmentDate").value);
     var dayAvailabilities;
     var timeValue = 900;
     // Change the timeslot options depending on the day selected
@@ -224,19 +224,20 @@ function validateForm() {
  * page.
  */ 
 function submitAppointment() {
-    var httpRequest = new XMLHttpRequest();
+    const httpRequest = new XMLHttpRequest();
     service = document.getElementById('service').value;
-    var duration = document.getElementById('duration').value;
-    var cost = document.getElementById('cost').value;
+    const duration = document.getElementById('duration').value;
+    const cost = document.getElementById('cost').value;
+    const date = new Date(document.getElementById('appointmentDate').value);
     appointmentDate = document.getElementById('appointmentDate').value;
     appointmentTime = document.getElementById('appointmentTime').value;
-    var info = document.getElementById('info').value;
-    var contact = document.getElementById('contact').value;
-    var name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+    const info = document.getElementById('info').value;
+    const contact = document.getElementById('contact').value;
+    const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
     // Change the innerHTML to a confirmation page once the request has successfully been sent and the response received
     httpRequest.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
-            createAppointmentConfirmationPage()
+            createAppointmentConfirmationPage();
         }
     }
 

@@ -26,6 +26,6 @@ function changeBanner() {
  * based on the window's and image's width.
  */
 function centerBannerImage(image) {
-    var imagePadding = 40;
+    const imagePadding = 40;
     image.style.marginLeft = (window.innerWidth * .833 - image.width) / 2 - imagePadding;
 }
