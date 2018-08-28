@@ -119,7 +119,6 @@ app.get('/manager-appointments-query', (req, res) => {
                 filteredFutureApp.push(childSnapshot);
             }
         });
-        console.log("success");
         res.status(200).json(filteredFutureApp);
     }).catch((e) => {
         console.log(`Query Error Message: ${e}`);

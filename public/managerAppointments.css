@@ -1,0 +1,13 @@
+table {
+    background-color: lightgray;
+}
+
+td, th {
+    border:groove;
+    border-color: black;
+    font-size: 18px;
+}
+
+.filled {
+    background-color: deeppink;
+}

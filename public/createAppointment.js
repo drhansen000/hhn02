@@ -41,22 +41,22 @@ function createAppointmentPage() {
                     <div class="col-4">
                         Time:<br />
                         <select id="appointmentTime" name="time" required>
-                            <option value="9:00 am">9:00 am</option>
-                            <option value="9:30 am">9:30 am</option>
-                            <option value="10:00 am">10:00 am</option>
-                            <option value="10:30 am">10:30 am</option>
-                            <option value="11:00 am">11:00 am</option>
-                            <option value="11:30 am">11:30 am</option>
-                            <option value="12:00 pm">12:00 pm</option>
-                            <option value="12:30 pm">12:30 pm</option>
-                            <option value="1:00 pm">1:00 pm</option>
-                            <option value="1:30 pm">1:30 pm</option>
-                            <option value="2:00 pm">2:00 pm</option>
-                            <option value="2:30 pm">2:30 pm</option>
-                            <option value="3:00 pm">3:00 pm</option>
-                            <option value="3:30 pm">3:30 pm</option>
-                            <option value="4:00 pm">4:00 pm</option>
-                            <option value="4:30 pm">4:30 pm</option>
+                            <option value="900">9:00 am</option>
+                            <option value="930">9:30 am</option>
+                            <option value="1000">10:00 am</option>
+                            <option value="1030">10:30 am</option>
+                            <option value="1100">11:00 am</option>
+                            <option value="1130">11:30 am</option>
+                            <option value="1200">12:00 pm</option>
+                            <option value="1230">12:30 pm</option>
+                            <option value="1300">1:00 pm</option>
+                            <option value="1330">1:30 pm</option>
+                            <option value="1400">2:00 pm</option>
+                            <option value="1430">2:30 pm</option>
+                            <option value="1500">3:00 pm</option>
+                            <option value="1530">3:30 pm</option>
+                            <option value="1600">4:00 pm</option>
+                            <option value="1630">4:30 pm</option>
                         </select>
                     </div>
                 </div>
@@ -173,6 +173,7 @@ function updateNormalHours() {
     // Create the variables that will be used during the function
     var appointmentDate = new Date(document.getElementById("appointmentDate").value);
     var dayAvailabilities;
+    var timeValue = 900;
     // Change the timeslot options depending on the day selected
     switch (appointmentDate.getDay()) {
         case 6:
@@ -180,14 +181,16 @@ function updateNormalHours() {
             break;
         case 5:
             for (var i = 0; i < saturdayAvailabilities.length; i++) {
-                dayAvailabilities += `<option value="${saturdayAvailabilities[i]}">
+                dayAvailabilities += `<option value="${timeValue}">
                                     ${saturdayAvailabilities[i]}</option>`;
+                timeValue = incrementTime(timeValue, i);
             }
             break;
         default:
             for (var i = 0; i < weekdayAvailabilities.length; i++) {
-                dayAvailabilities += `<option value="${weekdayAvailabilities[i]}">
+                dayAvailabilities += `<option value="${timeValue}">
                                     ${weekdayAvailabilities[i]}</option>`;
+                timeValue = incrementTime(timeValue, i);
             }
             break;
     };
@@ -248,4 +251,16 @@ function submitAppointment() {
         info: info,
         name: name,
         contact: contact}));
+}
+
+/*
+ * This function will check if the index is even or odd. If it's even, it'll add 30 to the time value.
+ * If it's odd, it'll add 70 to make it an even hundred.
+ */
+function incrementTime(timeValue, index) {
+    if (index % 2 == 0) {
+        return timeValue += 30;
+    } else {
+        return timeValue += 70;
+    }
 }
