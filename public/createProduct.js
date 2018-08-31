@@ -156,13 +156,13 @@ function createProductPage(href) {
         </p>
         <div class="product-item col-12">
             <div class="col-3">
-                <img class="product-image" src="images/MarulaOil-Rare-Oil-Replenishing-Shampoo.PNG">
+                <img class="product-image" src="https://hhn.updog.co/MarulaOil-Rare-Oil-Replenishing-Shampoo.png">
             </div>
             <div class="product-spec col-9 left">
                 <h5>MarulaOil: Rare Oil Replenishing Shampoo</h5>
                 7.5 oz<br />
                 $20<br />
-                <button onclick="addToCart('MarulaOil: Rare Oil Replenishing Shampoo' , 20, 'images/MarulaOil-Rare-Oil-Replenishing-Shampoo.PNG')">
+                <button onclick="addToCart('MarulaOil: Rare Oil Replenishing Shampoo' , 20, 'https://hhn.updog.co/MarulaOil-Rare-Oil-Replenishing-Shampoo.png')">
                     Add to Cart
                 </button><br />
             </div>
@@ -172,23 +172,23 @@ function createProductPage(href) {
                 <h5>MarulaOil: Rare Oil Replenishing Conditioner</h5>
                 7.5 oz<br />
                 $25<br />
-                <button onclick="addToCart('MarulaOil: Rare Oil Replenishing Conditioner' , 25, 'images/MarulaOil-Rare-Oil-Replenishing-Conditioner.PNG')">
+                <button onclick="addToCart('MarulaOil: Rare Oil Replenishing Conditioner' , 25, 'https://hhn.updog.co/MarulaOil-Rare-Oil-Replenishing-Conditioner.png')">
                     Add to Cart
                 </button><br />
             </div>
             <div class="col-3">
-                <img class="product-image" src="images/MarulaOil-Rare-Oil-Replenishing-Conditioner.PNG">
+                <img class="product-image" src="https://hhn.updog.co/MarulaOil-Rare-Oil-Replenishing-Conditioner.png">
             </div>
         </div>
         <div class="product-item col-12">
             <div class="col-3">
-                <img class="product-image" src="images/MarulaOil-Light-Rare-Oil-Volumizing-Shampoo.PNG">
+                <img class="product-image" src="https://hhn.updog.co/MarulaOil-Light-Rare-Oil-Volumizing-Shampoo.png">
             </div>
             <div class="product-spec col-9 left">
                 <h5>MarulaOil Light: Rare Oil Volumizing Shampoo</h5>
                 24 oz<br />
                 $20<br />
-                <button onclick="addToCart('MarulaOil Light: Rare Oil Volumizing Shampoo' , 20, 'images/MarulaOil-Light-Rare-Oil-Volumizing-Shampoo.PNG')">
+                <button onclick="addToCart('MarulaOil Light: Rare Oil Volumizing Shampoo' , 20, 'https://hhn.updog.co/MarulaOil-Light-Rare-Oil-Volumizing-Shampoo.png')">
                     Add to Cart
                 </button><br />
             </div>
@@ -198,12 +198,12 @@ function createProductPage(href) {
                 <h5>MarulaOil Light: Rare Oil Volumizing Conditioner</h5>
                 7.5 oz<br />
                 $25<br />
-                <button  id="Awapuhi" onclick="addToCart('MarulaOil Light: Rare Oil Volumizing Conditioner' , 25, 'images/MarulaOil-Light-Rare-Oil-Volumizing-Conditioner.PNG')">
+                <button  id="Awapuhi" onclick="addToCart('MarulaOil Light: Rare Oil Volumizing Conditioner' , 25, 'https://hhn.updog.co/MarulaOil-Light-Rare-Oil-Volumizing-Conditioner.png')">
                     Add to Cart
                 </button><br />
             </div>
             <div class="col-3">
-                <img class="product-image" src="images/MarulaOil-Light-Rare-Oil-Volumizing-Conditioner.PNG">
+                <img class="product-image" src="https://hhn.updog.co/MarulaOil-Light-Rare-Oil-Volumizing-Conditioner.png">
             </div>
         </div>
         <h3>Awapuhi</h3>
@@ -240,13 +240,13 @@ function createProductPage(href) {
         </div>
         <div class="product-item col-12">
             <div class="col-3">
-                <img class="product-image" src="images/Awapuhi-Wild-Ginger-Repair-Keratin-Intensive-Treatment.PNG">
+                <img class="product-image" src="https://hhn.updog.co/Awapuhi-Wild-Ginger-Repair-Keratin-Intensive-Treatment.png">
             </div>
             <div class="product-spec col-9 left">
                 <h5>Awapuhi Wild Ginger Repair: Keratin Intensive Treatment</h5>
                 5.1 oz<br />
                 $20<br />
-                <button  id="Strength" onclick="addToCart('Awapuhi Wild Ginger Repair: Keratin Intensive Treatment' , 20, 'images/Awapuhi-Wild-Ginger-Repair-Keratin-Intensive-Treatment.PNG')">
+                <button  id="Strength" onclick="addToCart('Awapuhi Wild Ginger Repair: Keratin Intensive Treatment' , 20, 'https://hhn.updog.co/Awapuhi-Wild-Ginger-Repair-Keratin-Intensive-Treatment.png')">
                     Add to Cart
                 </button><br />
             </div>
@@ -326,13 +326,13 @@ function createProductPage(href) {
         </p>
         <div class="product-item col-12">
             <div class="col-3">
-                <img class="product-image" src="images/Moisture-Instant-Moisture-Shampoo.JPG">
+                <img class="product-image" src="https://hhn.updog.co/Moisture-Instant-Moisture-Shampoo.jpg">
             </div>
             <div class="product-spec col-9 left">
                 <h5>Moisture: Instant Moisture Shampoo</h5>
                 10.14 oz<br />
                 $15<br />
-                <button onclick="addToCart('Moisture: Instant Moisture Shampoo' , 15, 'images/Moisture-Instant-Moisture-Shampoo.JPG')">
+                <button onclick="addToCart('Moisture: Instant Moisture Shampoo' , 15, 'https://hhn.updog.co/Moisture-Instant-Moisture-Shampoo.jpg')">
                     Add to Cart
                 </button><br />
             </div>
@@ -371,13 +371,13 @@ function createProductPage(href) {
         </p>
         <div class="product-item col-12">
             <div class="col-3">
-                <img class="product-image" src="images/Kids-Baby-Dont-Cry-Shampoo.JPG">
+                <img class="product-image" src="https://hhn.updog.co/Kids-Baby-Dont-Cry-Shampoo.jpg">
             </div>
             <div class="product-spec col-9 left">
                 <h5>Kids: Baby Don't Cry Shampoo</h5>
                 10.14 oz<br />
                 $10<br />
-                <button onclick="addToCart('Kids: Baby Don’t Cry Shampoo' , 10, 'images/Kids-Baby-Dont-Cry-Shampoo.JPG')">
+                <button onclick="addToCart('Kids: Baby Don’t Cry Shampoo' , 10, 'https://hhn.updog.co/Kids-Baby-Dont-Cry-Shampoo.jpg')">
                     Add to Cart
                 </button><br />
             </div>
@@ -448,13 +448,13 @@ function createProductPage(href) {
         </p>
         <div class="product-item col-12">
             <div class="col-3">
-                <img class="product-image" src="images/Neuro-Liquid-Protect.PNG">
+                <img class="product-image" src="https://hhn.updog.co/Neuro-Liquid-Protect.png">
             </div>
             <div class="product-spec col-9 left">
                 <h5>Neuro Liquid: Protect</h5>
                 6 oz<br />
                 $15<br />
-                <button onclick="addToCart('Neuro Liquid: Protect' , 15, 'images/Neuro-Liquid-Protect.PNG')">
+                <button onclick="addToCart('Neuro Liquid: Protect' , 15, 'https://hhn.updog.co/Neuro-Liquid-Protect.png')">
                     Add to Cart
                 </button><br />
             </div>
@@ -464,12 +464,12 @@ function createProductPage(href) {
                 <h5>Neuro Liquid: Prime</h5>
                 4.7 oz<br />
                 $12<br />
-                <button id="Invisiblewear" onclick="addToCart('Neuro Liquid: Prime' , 12, 'images/Neuro-Liquid-Prime.PNG')">
+                <button id="Invisiblewear" onclick="addToCart('Neuro Liquid: Prime' , 12, 'https://hhn.updog.co/Neuro-Liquid-Prime.png')">
                     Add to Cart
                 </button><br />
             </div>
             <div class="col-3">
-                <img class="product-image" src="images/Neuro-Liquid-Prime.PNG">
+                <img class="product-image" src="https://hhn.updog.co/Neuro-Liquid-Prime.png">
             </div>
         </div>
         <h2>Styling Needs</h2>
