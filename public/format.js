@@ -13,7 +13,6 @@ function formatDate(date) {
         'November',
         'December');
     // Replace - with / so that the Date is according to the local timezone
-    date = date.replace("-", "/");
     date = new Date(date);
     const day = daysOfTheWeek[date.getDay()];
     const month = months[date.getMonth()];
@@ -29,9 +28,11 @@ function formatTime(time) {
     } else {
         timeEnding = " pm";
     }
-    // Format the time into 12 hour format rather than 24
+    // Format the time into 12 hour format rather than 24 and cast it into a string
     if (time >= 1300) {
         time = `${time % 1200}`;
+    } else {
+        time = `${time}`;
     }
     // Insert the semi-colon
     if (time.length > 3) {

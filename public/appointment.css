@@ -1,0 +1,34 @@
+table {
+    background-color: lightgray;
+}
+
+th {
+    text-align: center;
+}
+
+td, th {
+    border: groove;
+    border-color: black;
+    font-size: 18px;
+}
+
+.filled {
+    background-color: deeppink;
+}
+
+td a {
+    display: block;
+}
+
+td a:hover {
+    background-color: lime;
+    cursor: pointer;
+}
+
+button:hover {
+    cursor: pointer;
+}
+
+#appointments {
+    text-align: center;
+}

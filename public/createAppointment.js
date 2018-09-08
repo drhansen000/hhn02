@@ -33,36 +33,6 @@ function createAppointmentPage() {
                 <div class="col-12">
                     <div class="col-2"></div>
                     <div class="col-4">
-                        Date:<br />
-                        <input style="width: 150px;" 
-                                id="appointmentDate" type="date" name="date" 
-                                onchange="updateNormalHours()" required>
-                    </div>
-                    <div class="col-4">
-                        Time:<br />
-                        <select id="appointmentTime" name="time" required>
-                            <option value="900">9:00 am</option>
-                            <option value="930">9:30 am</option>
-                            <option value="1000">10:00 am</option>
-                            <option value="1030">10:30 am</option>
-                            <option value="1100">11:00 am</option>
-                            <option value="1130">11:30 am</option>
-                            <option value="1200">12:00 pm</option>
-                            <option value="1230">12:30 pm</option>
-                            <option value="1300">1:00 pm</option>
-                            <option value="1330">1:30 pm</option>
-                            <option value="1400">2:00 pm</option>
-                            <option value="1430">2:30 pm</option>
-                            <option value="1500">3:00 pm</option>
-                            <option value="1530">3:30 pm</option>
-                            <option value="1600">4:00 pm</option>
-                            <option value="1630">4:30 pm</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-12">
-                    <div class="col-2"></div>
-                    <div class="col-4">
                         First Name:<br>
                         <input style="width: 150px;" id="firstName" type="text" 
                             name="firstName" placeholder="First Name" maxlength="20" required>
@@ -85,8 +55,18 @@ function createAppointmentPage() {
                     <button type="submit">Confirm Appointment</button>
                 </div>
             </form>
+            <h1>Appointments</h1>
+            <button onclick="displayPreviousWeek()">Previous Week</button>
+            <button onclick="displayNextWeek()">Next Week</button>
+                <table id="appointmentChart" class="col-12">
+                </table>
             </div>`;
     document.getElementById('information').innerHTML = appointmentDiv;
+    const today = new Date();
+    getWeekDates(today);
+    createTableOutline();
+    getBookedAppointments();
+    
     // Update the url
     history.replaceState(null, `Reserve Appointment`, `/Appointment`);
     // Update the title (the above method doesn't do it anymore)
@@ -97,10 +77,18 @@ function createAppointmentPage() {
 
 // Create global variables
 const saturdayAvailabilities = createSaturdayAvailabilities();
-const weekdayAvailabilities = createWeekdayAvailabilities();
+const weekdayAvailabilities  = createWeekdayAvailabilities();
+const tableTimes = createTableTimes();
+var weekDates = new Array();
 var service;
-var appointmentDate;
+var bookedAppointments;
 var appointmentTime;
+var appointmentDate;
+var appointmentDuration = 45;
+var bookedAppointments;
+var selectedTd = 0;
+var selectedDuration = 45;
+var appointmentOverlap = false;
 
 /*
  * Create an array of the normal hours of operation on Saturday.
@@ -141,6 +129,28 @@ function createWeekdayAvailabilities() {
 }
 
 /*
+ * This function creates an array of all of the times listed in the table.
+ */
+function createTableTimes() {
+    return new Array(900,
+        930,
+        1000,
+        1030,
+        1100,
+        1130,
+        1200,
+        1230,
+        1300,
+        1330,
+        1400,
+        1430,
+        1500,
+        1530,
+        1600,
+        1630);
+}
+
+/*
  * This function dynamically changes the service information displayed based on the 
  * service selected from the drop-down.
  */ 
@@ -158,6 +168,8 @@ function updateServiceDescription() {
                                          <div class="col-2"><u>Duration</u><br />${serviceObj.Duration} minutes</div>
                                          <div class="col-1"><u>Cost</u><br />$${serviceObj.Cost}</div>`;
             document.getElementById("serviceDetails").innerHTML = serviceInformation;
+            appointmentDuration = serviceObj.Duration;
+            updateAppointment(appointmentTime, appointmentDate.getDay());
         }
     };
 
@@ -203,18 +215,16 @@ function updateNormalHours() {
  * it will return false, or else it will return true.
  */ 
 function validateForm() {
-    var appointmentDate = new Date(document.getElementById("appointmentDate").value);
-    var today = new Date();
-    today.setDate(today.getDate() - 1);
-
-    if (appointmentDate.getDay() == 6) {
-        alert("We're not open on Sunday!");
-        return false;
-    } else if (appointmentDate < today) {
-        alert("Can't schedule an appointment for the past!");
-        return false;
+    if (appointmentDate && appointmentTime) {
+        if (appointmentOverlap) {
+            alert("The appointment you selected will overlap into an appointment that is already booked.\nPlease select another time.");
+            return false;
+        } else {
+            return true;
+        }
     } else {
-        return true;
+        alert("Please select a time and date from the table below.");
+        return false;
     }
 }
 
@@ -228,9 +238,6 @@ function submitAppointment() {
     service = document.getElementById('service').value;
     const duration = document.getElementById('duration').value;
     const cost = document.getElementById('cost').value;
-    const date = new Date(document.getElementById('appointmentDate').value);
-    appointmentDate = document.getElementById('appointmentDate').value;
-    appointmentTime = document.getElementById('appointmentTime').value;
     const info = document.getElementById('info').value;
     const contact = document.getElementById('contact').value;
     const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
@@ -247,11 +254,13 @@ function submitAppointment() {
         service: service,
         cost: cost,
         duration: duration,
-        date: appointmentDate,
+        date: `${appointmentDate.getFullYear()}/${appointmentDate.getMonth() + 1}/${appointmentDate.getDate()}`,
         time: appointmentTime,
         info: info,
         name: name,
-        contact: contact}));
+        contact: contact
+    }));
+
 }
 
 /*
@@ -264,4 +273,349 @@ function incrementTime(timeValue, index) {
     } else {
         return timeValue += 70;
     }
+}
+
+/*
+ * This function gets the current date and then utlizes that date to fill
+ * the array with the week's dates.
+ */
+function getWeekDates(date) {
+    for (var i = 0; i < 7; i++) {
+        if (i < date.getDay()) {
+            date.setDate(date.getDate() - (date.getDay() - i));
+            weekDates[i] = new Date(`${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
+        } else if (i == date.getDay()) {
+            weekDates[i] = new Date(date);
+        } else if (i > date.getDay()) {
+            date.setDate(date.getDate() + (i - date.getDay()));
+            weekDates[i] = new Date(`${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`);
+        }
+    }
+}
+
+/*
+ * This function creates the basic structure for the appointments selection table.
+ */
+function createTableOutline() {
+    document.getElementById('appointmentChart').innerHTML = `<tr>
+        <th>Time</th>
+        <th>Monday<br>${weekDates[1].getMonth() + 1}/${weekDates[1].getDate()}/${weekDates[1].getFullYear()}</th>
+        <th>Tuesday<br>${weekDates[2].getMonth() + 1}/${weekDates[2].getDate()}/${weekDates[2].getFullYear()}</th>
+        <th>Wednesday<br>${weekDates[3].getMonth() + 1}/${weekDates[3].getDate()}/${weekDates[3].getFullYear()}</th>
+        <th>Thursday<br>${weekDates[4].getMonth() + 1}/${weekDates[4].getDate()}/${weekDates[4].getFullYear()}</th>
+        <th>Friday<br>${weekDates[5].getMonth() + 1}/${weekDates[5].getDate()}/${weekDates[5].getFullYear()}</th>
+        <th>Saturday<br>${weekDates[6].getMonth() + 1}/${weekDates[6].getDate()}/${weekDates[6].getFullYear()}</th>
+    </tr>
+    <tr id="0">
+        <th>9:00 am</th>
+        <td><a onclick="updateAppointment(900, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(900, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(900, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(900, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(900, 5)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(900, 6)">&nbsp;</a></td>
+    </tr>
+    <tr id="1">
+        <th>9:30 am</th>
+        <td><a onclick="updateAppointment(930, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(930, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(930, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(930, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(930, 5)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(930, 6)">&nbsp;</a></td>
+    </tr>
+    <tr>
+        <th>10:00 am</th>
+        <td><a onclick="updateAppointment(1000, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1000, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1000, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1000, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1000, 5)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1000, 6)">&nbsp;</a></td>
+    </tr>
+    <tr>
+        <th>10:30 am</th>
+        <td><a onclick="updateAppointment(1030, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1030, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1030, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1030, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1030, 5)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1030, 6)">&nbsp;</a></td>
+    </tr>
+    <tr>
+        <th>11:00 am</th>
+        <td><a onclick="updateAppointment(1100, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1100, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1100, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1100, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1100, 5)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1100, 6)">&nbsp;</a></td>
+    </tr>
+    <tr>
+        <th>11:30 am</th>
+        <td><a onclick="updateAppointment(1130, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1130, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1130, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1130, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1130, 5)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1130, 6)">&nbsp;</a></td>
+    </tr>
+    <tr>
+        <th>12:00 pm</th>
+        <td><a onclick="updateAppointment(1200, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1200, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1200, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1200, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1200, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>12:30 pm</th>
+        <td><a onclick="updateAppointment(1230, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1230, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1230, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1230, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1230, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>1:00 pm</th>
+        <td><a onclick="updateAppointment(1300, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1300, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1300, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1300, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1300, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>1:30 pm</th>
+        <td><a onclick="updateAppointment(1330, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1330, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1330, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1330, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1330, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>2:00 pm</th>
+        <td><a onclick="updateAppointment(1400, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1400, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1400, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1400, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1400, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; text-align: center; background-color: darkgray;">Closed</td>
+    </tr>
+    <tr>
+        <th>2:30 pm</th>
+        <td><a onclick="updateAppointment(1430, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1430, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1430, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1430, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1430, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>3:00 pm</th>
+        <td><a onclick="updateAppointment(1500, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1500, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1500, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1500, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1500, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>3:30 pm</th>
+        <td><a onclick="updateAppointment(1530, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1530, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1530, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1530, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1530, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr>
+        <th>4:00 pm</th>
+        <td><a onclick="updateAppointment(1600, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1600, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1600, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1600, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1600, 5)">&nbsp;</a></td>
+        <td style="border-bottom: none; border-top: none; background-color: darkgray;"></td>
+    </tr>
+    <tr id="">
+        <th>4:30 pm</th>
+        <td><a onclick="updateAppointment(1630, 1)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1630, 2)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1630, 3)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1630, 4)">&nbsp;</a></td>
+        <td><a onclick="updateAppointment(1630, 5)">&nbsp;</a></td>
+        <td style="border-top: none; background-color: darkgray;"></td>
+    </tr>`;
+}
+
+/*
+ * This function sends a query to the DB for the booked appointments' date, time, 
+ * and duration.
+ */
+function getBookedAppointments() {
+    // Query the DB for the appointments
+    const httpRequest = new XMLHttpRequest();
+    var date;
+    var month;
+    if (weekDates[0].getDate() < 10) {
+        date = "0" + weekDates[0].getDate();
+    } else {
+        date = weekDates[0].getDate();
+    }
+    if (weekDates[0].getMonth() + 1 < 10) {
+        month = "0" + (weekDates[0].getMonth() + 1);
+    } else {
+        month = weekDates[0].getMonth() + 1;
+    }
+    const weekStartDate = `${weekDates[0].getFullYear()}/${month}/${date}`;
+    httpRequest.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            // Put the response into an object format
+            bookedAppointments = JSON.parse(this.responseText);
+            // Fill the table cells where the time is already taken on the specific day
+            for (var i = 0; i < bookedAppointments.length; i++) {
+                fillCells(bookedAppointments[i]);
+            }
+        }
+    };
+
+    httpRequest.open("GET", `/client-appointment-query?sunday=${weekDates[0]}`, true);
+    httpRequest.send();
+}
+
+/*
+ * This function checks the day and time of the appointment. It then fills the corresponding 
+ * time slot in the table.
+ */
+function fillCells(appointment) {
+    // Get the appointment's information
+    const date = new Date(appointment.date);
+    const time = appointment.time;
+    const duration = appointment.duration;
+    // Get the table's information
+    const daysInRow = 6;
+    const rowDuration = 30;
+    const indexOffset = 1;
+
+    // Locate the appointment's starting time
+    var desiredTd = tableTimes.indexOf(time) * daysInRow + date.getDay() - indexOffset;
+    console.log(tableTimes.indexOf(time));
+    // Fill the appointment's cell
+    document.getElementsByTagName('td')[desiredTd].style = "background-color: deeppink;"
+    // Insert the information into the correct cell
+    document.getElementsByTagName('td')[desiredTd].innerHTML = `Booked`;
+    // Fill sufficient cells for the appointment's duration
+    if (duration > rowDuration) {
+        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; background-color: deeppink";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: deeppink";
+        document.getElementsByTagName('td')[desiredTd].innerHTML = ``;
+    }
+    if (duration > rowDuration * 2) {
+        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: deeppink";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: deeppink";
+        document.getElementsByTagName('td')[desiredTd].innerHTML = ``;
+    }
+    if (duration > rowDuration * 3) {
+        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: deeppink";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: deeppink";
+        document.getElementsByTagName('td')[desiredTd].innerHTML = ``;
+    }
+}
+
+function updateAppointment(time, day) {
+    // TODO: Prevent overflow into closed time
+    // TODO: Fix crash for overflow out of table bounds
+    appointmentTime = time;
+    appointmentDate = weekDates[day];
+    appointmentOverlap = false;
+    resetPreviousSelection();
+    selectedDuration = appointmentDuration;
+    if (time % 100 == 0) {
+        selectedTd = (time / 100 - 9) * 12 + day - 1;
+    } else {
+        selectedTd = (((time - 30) / 100 - 9) * 12) + 6 + day - 1;
+    }
+    console.log(time);
+    console.log(day);
+    document.getElementsByTagName('td')[selectedTd].style = "background-color: lime;";
+    displayPossibleAppointment();
+}
+
+function resetPreviousSelection() {
+    // Get the table's information
+    const daysInRow = 6;
+    const rowDuration = 30;
+    // Locate the appointment's starting time
+    var desiredTd = selectedTd;
+    // Fill the appointment's cell
+    document.getElementsByTagName('td')[desiredTd].style = "background-color: light-gray;";
+    // Fill sufficient cells for the appointment's duration
+    if (selectedDuration > rowDuration && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
+        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+    }
+    if (selectedDuration > rowDuration * 2 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
+        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black;background-color: light-gray";
+    }
+    if (selectedDuration > rowDuration * 3 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
+        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+    }
+}
+
+function displayPossibleAppointment() {
+    // Get the table's information
+    const daysInRow = 6;
+    const rowDuration = 30;
+    // Locate the appointment's starting time
+    var desiredTd = selectedTd;
+    // Fill the appointment's cell
+    document.getElementsByTagName('td')[desiredTd].style = "background-color: lime;";
+    // Fill sufficient cells for the appointment's duration
+    if (appointmentDuration > rowDuration && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
+        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; background-color: lime";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
+    } else if (appointmentDuration > rowDuration) {
+        appointmentOverlap = true;
+    }
+    if (appointmentDuration > rowDuration * 2 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
+        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: lime";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
+    } else if (appointmentDuration > rowDuration * 2) {
+        appointmentOverlap = true;
+    }
+    if (appointmentDuration > rowDuration * 3 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
+        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: lime";
+        desiredTd += daysInRow;
+        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
+    } else if (appointmentDuration > rowDuration * 3) {
+        appointmentOverlap = true;
+    }
+}
+
+function displayNextWeek() {
+    weekDates[0].setDate(weekDates[0].getDate() + 7);
+    getBookedAppointments();
+    getWeekDates(weekDates[0]);
+    createTableOutline();
+}
+
+function displayPreviousWeek() {
+    weekDates[0].setDate(weekDates[0].getDate() - 7);
+    getWeekDates(weekDates[0]);
+    createTableOutline();
+    getBookedAppointments();
 }

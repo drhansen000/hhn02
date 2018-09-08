@@ -35,15 +35,15 @@ var getCurrentDate = () => {
     var currentDate;
     var dateObj = new Date();
     var month = dateObj.getUTCMonth() + 1; //months from 1-12
-    var day = dateObj.getUTCDate() - 1; //it was a day ahead for some reason
+    var day = dateObj.getUTCDate(); //it was a day ahead for some reason
     var year = dateObj.getUTCFullYear();
-    if (day < 10) {
-        day = `0${day}`;
-    }
-    if (month < 10) {
-        month = `0${month}`;
-    }
-    return (currentDate = year + "-" + month + "-" + day);
+    //if (day < 10) {
+    //    day = `0${day}`;
+    //}
+    //if (month < 10) {
+    //    month = `0${month}`;
+    //}
+    return (currentDate = year + "/" + month + "/" + day);
 }
 
 // View information from DB
@@ -61,56 +61,39 @@ app.get('/services-query', (req, res) => {
     });
 });
 
-// Submit information to DB
+/*
+ * This function should get all of the future appointments' dates and times from the DB and 
+ * send it back to the client in a JSON format.
+ */
+app.get('/client-appointment-query', (req, res) => {
+    var futureAppRef = db.db.ref(`/clientAppointments`);
+    futureAppRef.once('value', (snapshot) => {
+        var filteredFutureApp = new Array();
+        // Create the range for desired appointment dates
+        const weekStartDate = new Date(req.query.sunday);
+        var weekEndDate = new Date(req.query.sunday);
+        weekEndDate.setDate(weekEndDate.getDate() + 6);
+        var appointmentDate;
+        snapshot.forEach((childSnapshot) => {
+            appointmentDate = new Date(childSnapshot.val().date);
+            console.log("Appointment Date: " + appointmentDate);
+            if (appointmentDate >= weekStartDate && appointmentDate <= weekEndDate) {
+                filteredFutureApp.push(childSnapshot);
+                console.log("It was pushed");
+            }
+        });
+        res.status(200).json(filteredFutureApp);
+    }).catch((e) => {
+        console.log(`Query Error Message: ${e}`);
+    });
+});
 
 /*
- * This function creates an appointment by adding the information that the client selected to the Firebase DB.
+ * This query should get all of the future appointments and their information and 
+ * send it back to the client in a JSON format.
  */
-app.post('/create-appointment-query', (req, res) => {
-    var appRef = db.db.ref(`/Appointment`).push({
-        date: req.body.date,
-        info: req.body.info,
-        service: req.body.service,
-        duration: req.body.duration,
-        cost: req.body.cost,
-        time: req.body.time,
-        name: req.body.name,
-        contact: req.body.contact
-    });
-    res.status(200).send({ status: 'ok' });
-});
-
-app.post('/confirm-purchase-query', (req, res) => {
-    var purchaseRef = db.db.ref(`/Reserved-Products`).push({
-        Product: req.body.product,
-        Price: req.body.price,
-        Name: req.body.name,
-        Contact: req.body.contact,
-        Date: getCurrentDate()
-    });
-    res.status(200).send({ status: 'ok' });
-});
-
-app.post('/login-query', (req, res) => {
-    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
-        .then(() => {
-            res.status(200).send({ status: 'ok' });
-        })
-        .catch((error) => {
-            res.send({ status: 'invalid' });
-        });
-});
-
-app.get('/logout-query', (req, res) => {
-    firebase.auth().signOut().then(function () {
-        res.render('login.hbs');
-    }, function (error) {
-        console.log(error.message);
-    });
-});
-
 app.get('/manager-appointments-query', (req, res) => {
-    var futureAppRef = db.db.ref(`/Appointment`).orderByChild('date');
+    var futureAppRef = db.db.ref(`/managerAppointments`).orderByChild('date');
     futureAppRef.once('value', (snapshot) => {
         var filteredFutureApp = new Array();
         var numberOfAppointments = 0;
@@ -126,8 +109,71 @@ app.get('/manager-appointments-query', (req, res) => {
 });
 
 app.get('/manager-products-query', (req, res) => {
-    
+
 });
+
+// Submit information to DB
+
+/*
+ * This function creates an appointment by adding the information that the client selected to the Firebase DB.
+ * It inserts all of the information into the manager's appointments and only the appointment time, date, and 
+ * duration into the clients' apppointments.
+ */
+app.post('/create-appointment-query', (req, res) => {
+    db.db.ref(`/managerAppointments`).push({
+        date: req.body.date,
+        info: req.body.info,
+        service: req.body.service,
+        duration: req.body.duration,
+        cost: req.body.cost,
+        time: req.body.time,
+        name: req.body.name,
+        contact: req.body.contact
+    });
+    db.db.ref(`/clientAppointments`).push({
+        date: req.body.date,
+        duration: req.body.duration,
+        time: req.body.time
+    });
+    res.status(200).send({ status: 'ok' });
+});
+
+app.post('/confirm-purchase-query', (req, res) => {
+    db.db.ref(`/reservedProducts`).push({
+        Product: req.body.product,
+        Price: req.body.price,
+        Name: req.body.name,
+        Contact: req.body.contact,
+        Date: getCurrentDate()
+    });
+    res.status(200).send({ status: 'ok' });
+});
+
+/*
+ * This function logs the user into the DB, giving him/her certain privilages.
+ */
+app.post('/login-query', (req, res) => {
+    firebase.auth().signInWithEmailAndPassword(req.body.email, req.body.password)
+        .then(() => {
+            res.status(200).send({ status: 'ok' });
+        })
+        .catch((error) => {
+            res.send({ status: 'invalid' });
+        });
+});
+
+/*
+ * This function logs the user out of the DB, providing more security.
+ */
+app.get('/logout-query', (req, res) => {
+    firebase.auth().signOut().then(function () {
+        res.render('login.hbs');
+    }, function (error) {
+        console.log(error.message);
+    });
+});
+
+
 
 // Update information in DB
 
