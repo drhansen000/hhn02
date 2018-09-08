@@ -1,3 +1,42 @@
+// Create global variables
+const tableTimes        = createTableTimes();
+const closingTime       = 1700;
+var weekDates           = new Array();
+var appointmentOverlap  = false;
+var appointmentDuration = 45;
+var selectedTd;
+var previousDuration;
+var service;
+var bookedAppointments;
+var appointmentTime;
+var appointmentDate;
+
+/*
+ * This function creates an array of all of the times listed in the table.
+ */
+function createTableTimes() {
+    return new Array(900,
+        930,
+        1000,
+        1030,
+        1100,
+        1130,
+        1200,
+        1230,
+        1300,
+        1330,
+        1400,
+        1430,
+        1500,
+        1530,
+        1600,
+        1630);
+}
+
+/*
+ * This function creates the basic elements for the appointment page and calls other functions
+ * to create the more complex parts, which is the table.
+ */
 function createAppointmentPage() {
     var appointmentDiv;
     appointmentDiv = `<div id="appointment"> 
@@ -66,213 +105,13 @@ function createAppointmentPage() {
     getWeekDates(today);
     createTableOutline();
     getBookedAppointments();
-    
+
     // Update the url
     history.replaceState(null, `Reserve Appointment`, `/Appointment`);
     // Update the title (the above method doesn't do it anymore)
     document.title = `Reserve Appointment`;
     // Move the user to the top of the page
     window.location = "#page";
-}
-
-// Create global variables
-const saturdayAvailabilities = createSaturdayAvailabilities();
-const weekdayAvailabilities  = createWeekdayAvailabilities();
-const tableTimes = createTableTimes();
-var weekDates = new Array();
-var service;
-var bookedAppointments;
-var appointmentTime;
-var appointmentDate;
-var appointmentDuration = 45;
-var bookedAppointments;
-var selectedTd = 0;
-var selectedDuration = 45;
-var appointmentOverlap = false;
-
-/*
- * Create an array of the normal hours of operation on Saturday.
- */
-function createSaturdayAvailabilities() {
-    return new Array(
-        "9:00 am",
-        "9:30 am",
-        "10:00 am",
-        "10:30 am",
-        "11:00 am",
-        "11:30 am"
-    );
-}
-
-/*
- * Create an array of the normal hours of operation on weekdays.
- */
-function createWeekdayAvailabilities() {
-    return new Array(
-        "9:00 am",
-        "9:30 am",
-        "10:00 am",
-        "10:30 am",
-        "11:00 am",
-        "11:30 am",
-        "12:00 pm",
-        "12:30 pm",
-        "1:00 pm",
-        "1:30 pm",
-        "2:00 pm",
-        "2:30 pm",
-        "3:00 pm",
-        "3:30 pm",
-        "4:00 pm",
-        "4:30 pm"
-    );
-}
-
-/*
- * This function creates an array of all of the times listed in the table.
- */
-function createTableTimes() {
-    return new Array(900,
-        930,
-        1000,
-        1030,
-        1100,
-        1130,
-        1200,
-        1230,
-        1300,
-        1330,
-        1400,
-        1430,
-        1500,
-        1530,
-        1600,
-        1630);
-}
-
-/*
- * This function dynamically changes the service information displayed based on the 
- * service selected from the drop-down.
- */ 
-function updateServiceDescription() {
-    const serviceId = document.getElementById('serviceSelector').value;
-    const httpRequest = new XMLHttpRequest();
-    httpRequest.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            var serviceObj = JSON.parse(this.responseText);
-            var serviceInformation = `<input type="hidden" id="service" value="${serviceObj.Service}" />
-                                         <input type="hidden" id="duration" value="${serviceObj.Duration}" />
-                                         <input type="hidden" id="cost" value="${serviceObj.Cost}" />
-                                         <div class="col-2"></div>
-                                         <div class="col-4"><u>Service Name</u><br />${serviceObj.Service}</div>
-                                         <div class="col-2"><u>Duration</u><br />${serviceObj.Duration} minutes</div>
-                                         <div class="col-1"><u>Cost</u><br />$${serviceObj.Cost}</div>`;
-            document.getElementById("serviceDetails").innerHTML = serviceInformation;
-            appointmentDuration = serviceObj.Duration;
-            updateAppointment(appointmentTime, appointmentDate.getDay());
-        }
-    };
-
-    httpRequest.open("GET", `/services-query?serviceId=${serviceId}`, true);
-    httpRequest.send();
-}
-
-/*
- * This function updates the available timeslots based on the selected 
- * day's normal hours of operation.
- */ 
-function updateNormalHours() {
-    // Create the variables that will be used during the function
-    const appointmentDate = new Date(document.getElementById("appointmentDate").value);
-    var dayAvailabilities;
-    var timeValue = 900;
-    // Change the timeslot options depending on the day selected
-    switch (appointmentDate.getDay()) {
-        case 6:
-            dayAvailabilities = `<option>Closed</option>`;
-            break;
-        case 5:
-            for (var i = 0; i < saturdayAvailabilities.length; i++) {
-                dayAvailabilities += `<option value="${timeValue}">
-                                    ${saturdayAvailabilities[i]}</option>`;
-                timeValue = incrementTime(timeValue, i);
-            }
-            break;
-        default:
-            for (var i = 0; i < weekdayAvailabilities.length; i++) {
-                dayAvailabilities += `<option value="${timeValue}">
-                                    ${weekdayAvailabilities[i]}</option>`;
-                timeValue = incrementTime(timeValue, i);
-            }
-            break;
-    };
-    // Insert the options into the page
-    document.getElementById('appointmentTime').innerHTML = dayAvailabilities;
-};
-
-/*
- * This function checks if the date selected is on a Sunday or in the past. If so,
- * it will return false, or else it will return true.
- */ 
-function validateForm() {
-    if (appointmentDate && appointmentTime) {
-        if (appointmentOverlap) {
-            alert("The appointment you selected will overlap into an appointment that is already booked.\nPlease select another time.");
-            return false;
-        } else {
-            return true;
-        }
-    } else {
-        alert("Please select a time and date from the table below.");
-        return false;
-    }
-}
-
-/*
- * This function should only fire after validateForm() returns true. It takes all of the user's input and sends a 
- * request to be added to the DB. It the request was successful, it will update the innerHTML to the confirmation
- * page.
- */ 
-function submitAppointment() {
-    const httpRequest = new XMLHttpRequest();
-    service = document.getElementById('service').value;
-    const duration = document.getElementById('duration').value;
-    const cost = document.getElementById('cost').value;
-    const info = document.getElementById('info').value;
-    const contact = document.getElementById('contact').value;
-    const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
-    // Change the innerHTML to a confirmation page once the request has successfully been sent and the response received
-    httpRequest.onreadystatechange = function () {
-        if (this.readyState == 4 && this.status == 200) {
-            createAppointmentConfirmationPage();
-        }
-    }
-
-    httpRequest.open('POST', '/create-appointment-query', true);
-    httpRequest.setRequestHeader('Content-Type', 'application/json');
-    httpRequest.send(JSON.stringify({
-        service: service,
-        cost: cost,
-        duration: duration,
-        date: `${appointmentDate.getFullYear()}/${appointmentDate.getMonth() + 1}/${appointmentDate.getDate()}`,
-        time: appointmentTime,
-        info: info,
-        name: name,
-        contact: contact
-    }));
-
-}
-
-/*
- * This function will check if the index is even or odd. If it's even, it'll add 30 to the time value.
- * If it's odd, it'll add 70 to make it an even hundred.
- */
-function incrementTime(timeValue, index) {
-    if (index % 2 == 0) {
-        return timeValue += 30;
-    } else {
-        return timeValue += 70;
-    }
 }
 
 /*
@@ -367,7 +206,7 @@ function createTableOutline() {
         <td><a onclick="updateAppointment(1200, 3)">&nbsp;</a></td>
         <td><a onclick="updateAppointment(1200, 4)">&nbsp;</a></td>
         <td><a onclick="updateAppointment(1200, 5)">&nbsp;</a></td>
-        <td style="border-bottom: none; background-color: darkgray;"></td>
+        <td style="border-bottom: none; background-color: darkgray;"><span></span></td>
     </tr>
     <tr>
         <th>12:30 pm</th>
@@ -529,22 +368,70 @@ function fillCells(appointment) {
     }
 }
 
-function updateAppointment(time, day) {
-    // TODO: Prevent overflow into closed time
-    // TODO: Fix crash for overflow out of table bounds
-    appointmentTime = time;
-    appointmentDate = weekDates[day];
+/*
+ * This function dynamically changes the service information displayed based on the 
+ * service selected from the drop-down.
+ */ 
+function updateServiceDescription() {
+    const serviceId = document.getElementById('serviceSelector').value;
+    const httpRequest = new XMLHttpRequest();
+    httpRequest.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            var serviceObj = JSON.parse(this.responseText);
+            var serviceInformation = `<input type="hidden" id="service" value="${serviceObj.Service}" />
+                                         <input type="hidden" id="duration" value="${serviceObj.Duration}" />
+                                         <input type="hidden" id="cost" value="${serviceObj.Cost}" />
+                                         <div class="col-2"></div>
+                                         <div class="col-4"><u>Service Name</u><br />${serviceObj.Service}</div>
+                                         <div class="col-2"><u>Duration</u><br />${serviceObj.Duration} minutes</div>
+                                         <div class="col-1"><u>Cost</u><br />$${serviceObj.Cost}</div>`;
+            document.getElementById("serviceDetails").innerHTML = serviceInformation;
+            appointmentDuration = serviceObj.Duration;
+            updateAppointment(appointmentTime, appointmentDate.getDay());
+        }
+    };
+
+    httpRequest.open("GET", `/services-query?serviceId=${serviceId}`, true);
+    httpRequest.send();
+}
+
+function displayNextWeek() {
+    weekDates[0].setDate(weekDates[0].getDate() + 7);
+    getWeekDates(weekDates[0]);
+    createTableOutline();
+    getBookedAppointments();
+    // Reset the necessary table variables
     appointmentOverlap = false;
-    resetPreviousSelection();
-    selectedDuration = appointmentDuration;
+    appointmentDate = null;
+    appointmentTime = null;
+    selectedTd = null;
+}
+
+function displayPreviousWeek() {
+    weekDates[0].setDate(weekDates[0].getDate() - 7);
+    getWeekDates(weekDates[0]);
+    createTableOutline();
+    getBookedAppointments();
+    // Reset the necessary table variables
+    appointmentOverlap = false;
+    appointmentDate = null;
+    appointmentTime = null;
+    selectedTd = null;
+}
+
+function updateAppointment(time, day) {
+    if (appointmentTime && appointmentDate) {
+        resetPreviousSelection();
+    }
+    appointmentDate = weekDates[day];
+    appointmentTime = time;
+    previousDuration = appointmentDuration;
+    previousTime = appointmentTime;
     if (time % 100 == 0) {
         selectedTd = (time / 100 - 9) * 12 + day - 1;
     } else {
         selectedTd = (((time - 30) / 100 - 9) * 12) + 6 + day - 1;
     }
-    console.log(time);
-    console.log(day);
-    document.getElementsByTagName('td')[selectedTd].style = "background-color: lime;";
     displayPossibleAppointment();
 }
 
@@ -557,24 +444,43 @@ function resetPreviousSelection() {
     // Fill the appointment's cell
     document.getElementsByTagName('td')[desiredTd].style = "background-color: light-gray;";
     // Fill sufficient cells for the appointment's duration
-    if (selectedDuration > rowDuration && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
-        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
-        desiredTd += daysInRow;
-        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+    if (previousDuration > rowDuration &&
+        appointmentTime + convertTimeToDecimal(rowDuration * 2) <= closingTime)
+    {
+        if (document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked" &&
+            document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "<span></span>")
+        {
+            document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+            desiredTd += daysInRow;
+            document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+        }
     }
-    if (selectedDuration > rowDuration * 2 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
-        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
-        desiredTd += daysInRow;
-        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black;background-color: light-gray";
+    if (previousDuration > rowDuration * 2 &&
+        appointmentTime + convertTimeToDecimal(rowDuration * 3) <= closingTime)
+    {
+        if (document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked" &&
+            document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "<span></span>")
+        {
+            document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+            desiredTd += daysInRow;
+            document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black;background-color: light-gray";
+        }
     }
-    if (selectedDuration > rowDuration * 3 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
-        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
-        desiredTd += daysInRow;
-        document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+    if (previousDuration > rowDuration * 3 &&
+        appointmentTime + convertTimeToDecimal(rowDuration * 4) <= closingTime)
+    {
+        if (document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked" &&
+            document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "<span></span>")
+        {
+            document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+            desiredTd += daysInRow;
+            document.getElementsByTagName('td')[desiredTd].style = "border: groove; border-color: black; background-color: light-gray";
+        }
     }
 }
 
 function displayPossibleAppointment() {
+    appointmentOverlap = false;
     // Get the table's information
     const daysInRow = 6;
     const rowDuration = 30;
@@ -583,39 +489,117 @@ function displayPossibleAppointment() {
     // Fill the appointment's cell
     document.getElementsByTagName('td')[desiredTd].style = "background-color: lime;";
     // Fill sufficient cells for the appointment's duration
-    if (appointmentDuration > rowDuration && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
-        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; background-color: lime";
-        desiredTd += daysInRow;
-        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
-    } else if (appointmentDuration > rowDuration) {
-        appointmentOverlap = true;
-    }
-    if (appointmentDuration > rowDuration * 2 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
-        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: lime";
-        desiredTd += daysInRow;
-        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
-    } else if (appointmentDuration > rowDuration * 2) {
-        appointmentOverlap = true;
-    }
-    if (appointmentDuration > rowDuration * 3 && document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked") {
-        document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: lime";
-        desiredTd += daysInRow;
-        document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
-    } else if (appointmentDuration > rowDuration * 3) {
-        appointmentOverlap = true;
+    if (appointmentDuration > rowDuration &&
+        appointmentTime + convertTimeToDecimal(rowDuration * 2) <= closingTime)
+    {
+        if (document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked" &&
+            document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "<span></span>") {
+            document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; background-color: lime";
+            desiredTd += daysInRow;
+            document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
+        } else {
+            appointmentOverlap = true;
+        }
+    } 
+    if (appointmentDuration > rowDuration * 2 &&
+        appointmentTime + convertTimeToDecimal(rowDuration * 3) <= closingTime)
+    {
+        if (document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked" &&
+            document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "<span></span>") {
+            document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: lime";
+            desiredTd += daysInRow;
+            document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
+        } else {
+            appointmentOverlap = true;
+        }
+    } 
+    if (appointmentDuration > rowDuration * 3 &&
+        appointmentTime + convertTimeToDecimal(rowDuration * 4) <= closingTime)
+    {
+        if (document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "Booked" &&
+            document.getElementsByTagName('td')[desiredTd + daysInRow].innerHTML != "<span></span>") {
+            document.getElementsByTagName('td')[desiredTd].style = "border-bottom: none; border-top: none; background-color: lime";
+            desiredTd += daysInRow;
+            document.getElementsByTagName('td')[desiredTd].style = "border-top: none; background-color: lime";
+        } else {
+            appointmentOverlap = true;
+        }
+    } 
+}
+
+/*
+ * This function checks if the date selected is on a Sunday or in the past. If so,
+ * it will return false, or else it will return true.
+ */ 
+function validateForm() {
+    if (appointmentDate && appointmentTime) {
+        if (appointmentTime + convertTimeToDecimal(appointmentDuration) > closingTime) {
+            alert("The appointment time you selected will go past closing time. Please select an earlier time.");
+            return false;
+        } else if (appointmentOverlap) {
+            alert("The appointment you selected will overlap into an appointment that is already booked.\nPlease select another time.");
+            return false;
+        } else {
+            return true;
+        }
+    } else {
+        alert("Please select a time and date from the table below.");
+        return false;
     }
 }
 
-function displayNextWeek() {
-    weekDates[0].setDate(weekDates[0].getDate() + 7);
-    getBookedAppointments();
-    getWeekDates(weekDates[0]);
-    createTableOutline();
+/*
+ * This function should only fire after validateForm() returns true. It takes all of the user's input and sends a 
+ * request to be added to the DB. It the request was successful, it will update the innerHTML to the confirmation
+ * page.
+ */ 
+function submitAppointment() {
+    const httpRequest = new XMLHttpRequest();
+    service = document.getElementById('service').value;
+    const duration = document.getElementById('duration').value;
+    const cost = document.getElementById('cost').value;
+    const info = document.getElementById('info').value;
+    const contact = document.getElementById('contact').value;
+    const name = document.getElementById('firstName').value + ' ' + document.getElementById('lastName').value;
+    // Change the innerHTML to a confirmation page once the request has successfully been sent and the response received
+    httpRequest.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+            createAppointmentConfirmationPage();
+        }
+    }
+
+    httpRequest.open('POST', '/create-appointment-query', true);
+    httpRequest.setRequestHeader('Content-Type', 'application/json');
+    httpRequest.send(JSON.stringify({
+        service: service,
+        cost: cost,
+        duration: duration,
+        date: `${appointmentDate.getFullYear()}/${appointmentDate.getMonth() + 1}/${appointmentDate.getDate()}`,
+        time: appointmentTime,
+        info: info,
+        name: name,
+        contact: contact
+    }));
+
 }
 
-function displayPreviousWeek() {
-    weekDates[0].setDate(weekDates[0].getDate() - 7);
-    getWeekDates(weekDates[0]);
-    createTableOutline();
-    getBookedAppointments();
+/*
+ * This function turns time, which is Sexagesimal, with a range of 30 to 120 to the Decimal system.
+ */
+function convertTimeToDecimal(duration) {
+    console.log("Duration: " + duration);
+    switch (duration) {
+        case 60:
+            return 100;
+            break;
+        case 90:
+            return 130;
+            break;
+        case 120:
+            return 200;
+            break;
+        default:
+            return duration;
+            break;
+    }
 }

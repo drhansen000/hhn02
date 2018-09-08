@@ -7,6 +7,14 @@ function createAppointmentConfirmationPage() {
     for your <b>${service}</b>!</p>
 </div>`;
     document.getElementById('information').innerHTML = appointmentConfirmationDiv;
+    // Clear the variables
+    appointmentDuration = null;
+    selectedTd = null;
+    previousDuration = null;
+    appointmentOverlap = false;
+    service = null;
+    appointmentTime = null;
+    appointmentDate = null;
     // Update the title (the above method doesn't do it anymore)
     document.title = `Appointment Confirmation`;
     // Move the user to the top of the page

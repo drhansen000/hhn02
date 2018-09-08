@@ -52,7 +52,6 @@ var getCurrentDate = () => {
  * This function gets a service description, depending on the id provided.
  */
 app.get('/services-query', (req, res) => {
-    console.log(req.query.serviceId);
     var serviceRef = db.db.ref(`/Service/${req.query.serviceId}`);
     serviceRef.once('value', (snapshot) => {
         res.status(200).send(snapshot);
@@ -76,10 +75,8 @@ app.get('/client-appointment-query', (req, res) => {
         var appointmentDate;
         snapshot.forEach((childSnapshot) => {
             appointmentDate = new Date(childSnapshot.val().date);
-            console.log("Appointment Date: " + appointmentDate);
             if (appointmentDate >= weekStartDate && appointmentDate <= weekEndDate) {
                 filteredFutureApp.push(childSnapshot);
-                console.log("It was pushed");
             }
         });
         res.status(200).json(filteredFutureApp);

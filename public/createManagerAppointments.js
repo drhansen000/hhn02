@@ -1,6 +1,7 @@
 // Make global variables
 var appointmentList;
 var weekDates = new Array();
+const tableTimes = createTableTimes();
 
 function createManagerAppointmentsPage() {
     var appointmentsDiv;
@@ -217,9 +218,6 @@ function createTableOutline() {
         <td></td>
     </tr>`;
 }
-
-// Create global variables
-const tableTimes = createTableTimes();
 
 function createTableTimes() {
     return new Array('900',
