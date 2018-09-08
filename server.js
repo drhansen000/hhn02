@@ -93,9 +93,14 @@ app.get('/manager-appointments-query', (req, res) => {
     var futureAppRef = db.db.ref(`/managerAppointments`).orderByChild('date');
     futureAppRef.once('value', (snapshot) => {
         var filteredFutureApp = new Array();
-        var numberOfAppointments = 0;
+        // Create the range for desired appointment dates
+        const weekStartDate = new Date(req.query.sunday);
+        var weekEndDate = new Date(req.query.sunday);
+        weekEndDate.setDate(weekEndDate.getDate() + 6);
+        var appointmentDate;
         snapshot.forEach((childSnapshot) => {
-            if (childSnapshot.val().date >= getCurrentDate()) {
+            appointmentDate = new Date(childSnapshot.val().date);
+            if (appointmentDate >= weekStartDate && appointmentDate <= weekEndDate) {
                 filteredFutureApp.push(childSnapshot);
             }
         });
@@ -169,8 +174,6 @@ app.get('/logout-query', (req, res) => {
         console.log(error.message);
     });
 });
-
-
 
 // Update information in DB
 

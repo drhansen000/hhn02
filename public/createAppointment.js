@@ -342,7 +342,6 @@ function fillCells(appointment) {
 
     // Locate the appointment's starting time
     var desiredTd = tableTimes.indexOf(time) * daysInRow + date.getDay() - indexOffset;
-    console.log(tableTimes.indexOf(time));
     // Fill the appointment's cell
     document.getElementsByTagName('td')[desiredTd].style = "background-color: deeppink;"
     // Insert the information into the correct cell
@@ -533,7 +532,10 @@ function displayPossibleAppointment() {
  */ 
 function validateForm() {
     if (appointmentDate && appointmentTime) {
-        if (appointmentTime + convertTimeToDecimal(appointmentDuration) > closingTime) {
+        if (appointmentDate <= new Date()) {
+            alert("Please provide atleast 24 hours notice before scheduling an appointment.");
+            return false;
+        } else if (appointmentTime + convertTimeToDecimal(appointmentDuration) > closingTime) {
             alert("The appointment time you selected will go past closing time. Please select an earlier time.");
             return false;
         } else if (appointmentOverlap) {
@@ -587,7 +589,6 @@ function submitAppointment() {
  * This function turns time, which is Sexagesimal, with a range of 30 to 120 to the Decimal system.
  */
 function convertTimeToDecimal(duration) {
-    console.log("Duration: " + duration);
     switch (duration) {
         case 60:
             return 100;
