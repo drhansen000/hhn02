@@ -558,7 +558,6 @@ function validateForm() {
 function submitAppointment() {
     const httpRequest = new XMLHttpRequest();
     service = document.getElementById('service').value;
-    const duration = document.getElementById('duration').value;
     const cost = document.getElementById('cost').value;
     const info = document.getElementById('info').value;
     const contact = document.getElementById('contact').value;
@@ -575,7 +574,7 @@ function submitAppointment() {
     httpRequest.send(JSON.stringify({
         service: service,
         cost: cost,
-        duration: duration,
+        duration: appointmentDuration,
         date: `${appointmentDate.getFullYear()}/${appointmentDate.getMonth() + 1}/${appointmentDate.getDate()}`,
         time: appointmentTime,
         info: info,

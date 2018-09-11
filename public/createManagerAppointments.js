@@ -36,7 +36,6 @@ function getBookedAppointments() {
                 if (appointmentList[i].info == '') {
                     appointmentList[i].info = 'None';
                 }
-                console.log(appointmentList[i]);
                 fillCells(appointmentList[i], i);
             }
         }
