@@ -84,7 +84,7 @@ function createAppointmentPage() {
                 </div>
                 <div class="col-12">
                     Email/Phone (Optional):<br />
-                    <input id="contact" type="text" name="contact" style="width: 400px" placeholder="Email/Password" maxlength="50">
+                    <input id="contact" type="text" name="contact" style="width: 400px" placeholder="Email/Phone" maxlength="50">
                 </div>
                 <div class="col-12">
                     Additional Information for Service Provider (Optional):<br />

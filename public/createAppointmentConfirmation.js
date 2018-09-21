@@ -8,11 +8,9 @@ function createAppointmentConfirmationPage() {
 </div>`;
     document.getElementById('information').innerHTML = appointmentConfirmationDiv;
     // Clear the variables
-    appointmentDuration = null;
     selectedTd = null;
     previousDuration = null;
     appointmentOverlap = false;
-    service = null;
     appointmentTime = null;
     appointmentDate = null;
     // Update the title (the above method doesn't do it anymore)
